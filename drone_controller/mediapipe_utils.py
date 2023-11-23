@@ -94,10 +94,10 @@ def extract_hand_region(image, pose_results):
     left_hand_region = image[left_hand_y:left_hand_y + left_hand_h, left_hand_x:left_hand_x + left_hand_w]
     right_hand_region = image[right_hand_y:right_hand_y + right_hand_h, right_hand_x:right_hand_x + right_hand_w]
 
-    cv.rectangle(image, (left_hand_x, left_hand_y), (left_hand_x + left_hand_w, left_hand_y + left_hand_h),
-                    (0, 255, 0), 2)
-    cv.rectangle(image, (right_hand_x, right_hand_y),
-                    (right_hand_x + right_hand_w, right_hand_y + right_hand_h), (0, 255, 0), 2)
+    # cv.rectangle(image, (left_hand_x, left_hand_y), (left_hand_x + left_hand_w, left_hand_y + left_hand_h),
+    #                 (0, 255, 0), 2)
+    # cv.rectangle(image, (right_hand_x, right_hand_y),
+    #                 (right_hand_x + right_hand_w, right_hand_y + right_hand_h), (0, 255, 0), 2)
 
     elbow_landmark = pose_results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW]
     wrist_landmark = pose_results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]

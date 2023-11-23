@@ -12,7 +12,11 @@ def recognize_gesture(results, debug_image):
         pre_processed_landmark_list = pre_process_landmark(landmark_list)
         hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
         gesture = hand_sign_id
-    return hand_sign_id
+    return hand_sign_id, keypoint_classifier_labels
+
+def translate_gesture_id_to_name(gesture_id, keypoint_classifier_labels):
+    return keypoint_classifier_labels[gesture_id]
+
 
 def calc_landmark_list(image, landmarks):
     image_width, image_height = image.shape[1], image.shape[0]
@@ -123,19 +127,5 @@ class KeyPointClassifier(object):
         return result_index
 
 
-# def keypoint_classifier(model_path='model/keypoint_classifier/keypoint_classifier.tflite', landmark_list=''):
-#     interpreter = tf.lite.Interpreter(model_path=model_path, num_threads=1)
-#     interpreter.allocate_tensors()
-#     input_details = interpreter.get_input_details()
-#     output_details = interpreter.get_output_details()
-
-#     input_details_tensor_index = input_details[0]['index']
-#     interpreter.set_tensor(input_details_tensor_index,
-#                            np.array([landmark_list], dtype=np.float32))
-#     interpreter.invoke()
-#     output_details_tensor_index = output_details[0]['index']
-#     result = interpreter.get_tensor(output_details_tensor_index)
-#     result_index = np.argmax(np.squeeze(result))
-#     return result_index
 
 

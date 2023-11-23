@@ -23,12 +23,13 @@ def main():
         hands, right_hand_roi = mediapipe_utils.extract_pose_and_hands(image)
         cv.imshow('ThirdPerson', image)
         if hands:
-            cv.imshow('Right Hand', right_hand_roi)
-        
             # Recognize gesture using neural network
-            gesture = gesture_recognition.recognize_gesture(hands, right_hand_roi)
-            cv.putText(image, f'Gesture: {gesture}', (20, 150), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            print(gesture)
+            gesture, labels = gesture_recognition.recognize_gesture(hands, right_hand_roi)
+            gesture_name = gesture_recognition.translate_gesture_id_to_name(gesture, labels)
+            
+            cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (150,0,0), 2)
+
+            cv.imshow('Right Hand', right_hand_roi)
         
         # Map recognized gesture to instructions
         # instruction = gesture_instructions.map_to_instruction(gesture)  # Function in gesture_instructions.py
