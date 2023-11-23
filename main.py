@@ -1,6 +1,5 @@
 # from drone_controller import drone
 from drone_controller import mediapipe_utils
-from webcam_sim import webcam_functions
 from neural_network import gesture_recognition
 # from instructions import gesture_instructions
 import cv2 as cv
@@ -26,8 +25,10 @@ def main():
         if hands:
             cv.imshow('Right Hand', right_hand_roi)
         
-        # Recognize gesture using neural network
-        gesture = gesture_recognition.recognize_gesture(hands)  # Function in gesture_recognition.py
+            # Recognize gesture using neural network
+            gesture = gesture_recognition.recognize_gesture(hands, right_hand_roi)
+            cv.putText(image, f'Gesture: {gesture}', (20, 150), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            print(gesture)
         
         # Map recognized gesture to instructions
         # instruction = gesture_instructions.map_to_instruction(gesture)  # Function in gesture_instructions.py
@@ -38,7 +39,6 @@ def main():
         # Break the loop based on some condition (optional)
         if key == ord('q'):
             # drone.terminate_drone(drone_instance)
-            webcam_functions.terminate_drone()
             mediapipe_utils.terminate_hands()
             mediapipe_utils.terminate_pose()
             break

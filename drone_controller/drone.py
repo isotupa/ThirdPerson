@@ -2,6 +2,7 @@
 from djitellopy import Tello
 
 global takeoff
+takeoff = False
 
 def connect_to_drone():
     # Create an instance of the Tello class
