@@ -12,7 +12,7 @@ def recognize_gesture(results, debug_image):
         pre_processed_landmark_list = pre_process_landmark(landmark_list)
         hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
         gesture = hand_sign_id
-    return hand_sign_id, keypoint_classifier_labels
+    return gesture, keypoint_classifier_labels
 
 def translate_gesture_id_to_name(gesture_id, keypoint_classifier_labels):
     return keypoint_classifier_labels[gesture_id]

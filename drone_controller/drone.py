@@ -33,3 +33,6 @@ def terminate_drone(drone: Tello):
         drone.land()
     drone.streamoff()
     drone.end()
+
+def execute_instruction(drone: Tello, instruction_id):
+    pass

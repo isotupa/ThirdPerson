@@ -19,8 +19,9 @@ def extract_pose_and_hands(image):
         right_hand_roi = extract_hand_region(original, pose_results)
         if right_hand_roi is not None:
             hands_results = extract_hands(right_hand_roi)
-            return hands_results, right_hand_roi
-    return None, None
+            return pose_results, hands_results, right_hand_roi
+        return pose_results, None, None
+    return None, None, None
 
 def initialise_pose(min_detection_confidence=0.5, min_tracking_confidence=0.5):
     global pose

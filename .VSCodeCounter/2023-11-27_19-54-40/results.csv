@@ -1,0 +1,14 @@
+"filename", "language", "Python", "CSV", "JSON", "comment", "blank", "total"
+"/Users/kaizalk/thirdPerson/drone_controller/__init__.py", "Python", 2, 0, 0, 0, 0, 2
+"/Users/kaizalk/thirdPerson/drone_controller/drone.py", "Python", 22, 0, 0, 5, 11, 38
+"/Users/kaizalk/thirdPerson/drone_controller/mediapipe_utils.py", "Python", 75, 0, 0, 15, 25, 115
+"/Users/kaizalk/thirdPerson/instructions/__init__.py", "Python", 1, 0, 0, 0, 0, 1
+"/Users/kaizalk/thirdPerson/instructions/gesture_instructions.py", "Python", 0, 0, 0, 0, 1, 1
+"/Users/kaizalk/thirdPerson/main.py", "Python", 27, 0, 0, 14, 11, 52
+"/Users/kaizalk/thirdPerson/model/Keypoint_model_training.ipynb", "JSON", 0, 0, 1649, 0, 1, 1650
+"/Users/kaizalk/thirdPerson/model/add_gesture.py", "Python", 84, 0, 0, 22, 41, 147
+"/Users/kaizalk/thirdPerson/model/keypoint.csv", "CSV", 0, 6265, 0, 0, 1, 6266
+"/Users/kaizalk/thirdPerson/model/keypoint_classifier_label.csv", "CSV", 0, 9, 0, 0, 1, 10
+"/Users/kaizalk/thirdPerson/neural_network/__init__.py", "Python", 1, 0, 0, 0, 0, 1
+"/Users/kaizalk/thirdPerson/neural_network/gesture_recognition.py", "Python", 86, 0, 0, 6, 40, 132
+"Total", "-", 298, 6274, 1649, 62, 132, 8415
