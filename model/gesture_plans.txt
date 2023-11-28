@@ -1,0 +1,13 @@
+Stop -> Fist
+Forward -> Palm towards the drone
+Backward -> Palm with knuckles towards the drone
+Up -> Thumbs up
+Down -> Thumbs down
+Left -> Thumbs Left
+Right -> Thumbs Right
+Surf -> Roll
+Ok -> Land
+Follow
+Circle
+Change follow
+takeoff?

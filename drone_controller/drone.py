@@ -1,5 +1,5 @@
-# drone_controller/drone.py
 from djitellopy import Tello
+import threading
 
 global takeoff
 takeoff = False
@@ -34,5 +34,5 @@ def terminate_drone(drone: Tello):
     drone.streamoff()
     drone.end()
 
-def execute_instruction(drone: Tello, instruction_id):
-    pass
+def execute_instruction(drone: Tello, move):
+    threading.Thread(target=drone.send_rc_control, args=move).start()

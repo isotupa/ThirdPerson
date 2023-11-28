@@ -1,0 +1,43 @@
+Date : 2023-11-28 12:09:03
+Directory : /Users/kaizalk/thirdPerson
+Total : 11 files,  203 codes, 18 comments, 55 blanks, all 276 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Python   |          4 |        123 |         18 |         29 |        170 |
+| Markdown |          4 |         63 |          0 |         26 |         89 |
+| CSV      |          2 |         16 |          0 |          0 |         16 |
+| JSON     |          1 |          1 |          0 |          0 |          1 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                          | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                             |         11 |        203 |         18 |         55 |        276 |
+| . (Files)                                                                     |          1 |          8 |          0 |          2 |         10 |
+| .VSCodeCounter                                                                |          7 |         80 |          0 |         26 |        106 |
+| .VSCodeCounter/2023-11-27_19-54-40                                            |          7 |         80 |          0 |         26 |        106 |
+| drone_controller                                                              |          1 |          1 |          0 |          0 |          1 |
+| instructions                                                                  |          2 |        114 |         18 |         27 |        159 |
++-------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                      | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /Users/kaizalk/thirdPerson/.VSCodeCounter/2023-11-27_19-54-40/details.md      | Markdown |         21 |          0 |          6 |         27 |
+| /Users/kaizalk/thirdPerson/.VSCodeCounter/2023-11-27_19-54-40/diff-details.md | Markdown |          9 |          0 |          6 |         15 |
+| /Users/kaizalk/thirdPerson/.VSCodeCounter/2023-11-27_19-54-40/diff.csv        | CSV      |          2 |          0 |          0 |          2 |
+| /Users/kaizalk/thirdPerson/.VSCodeCounter/2023-11-27_19-54-40/diff.md         | Markdown |         12 |          0 |          7 |         19 |
+| /Users/kaizalk/thirdPerson/.VSCodeCounter/2023-11-27_19-54-40/results.csv     | CSV      |         14 |          0 |          0 |         14 |
+| /Users/kaizalk/thirdPerson/.VSCodeCounter/2023-11-27_19-54-40/results.json    | JSON     |          1 |          0 |          0 |          1 |
+| /Users/kaizalk/thirdPerson/.VSCodeCounter/2023-11-27_19-54-40/results.md      | Markdown |         21 |          0 |          7 |         28 |
+| /Users/kaizalk/thirdPerson/drone_controller/mediapipe_utils.py                | Python   |          1 |          0 |          0 |          1 |
+| /Users/kaizalk/thirdPerson/instructions/gesture_buffer.py                     | Python   |         15 |          0 |          3 |         18 |
+| /Users/kaizalk/thirdPerson/instructions/gesture_instructions.py               | Python   |         99 |         18 |         24 |        141 |
+| /Users/kaizalk/thirdPerson/main.py                                            | Python   |          8 |          0 |          2 |         10 |
+| Total                                                                         |          |        203 |         18 |         55 |        276 |
++-------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

@@ -8,43 +8,55 @@ class Instructions():
     speed = 10
     previous_move = (0,0,0,0)
 
-    # def __init__():
-    #     pass
+    def __init__(self, speed=10):
+        self.speed = speed
 
     def get_follow_state(self):
         return self.follow_behaviour
 
+    def get_takeoff_state(self):
+        return self.takeoff
+
     def calculate_move(self, gesture_id, pose, image):
         if gesture_id == None:
             return self.previous_move
-        match gesture_id:
-            case 0: # Forward
-                return (0, self.speed, 0, 0)
-            case 1: # Stop
-                return (0,0,0,0)
-            case 2: # Up
-                return (0,0,self.speed, 0)
-            # case 3: # Land
-            #     return "land", 0 # TODO
-            case 4: # Down
-                return (0,0,-self.speed, 0)
-            case 5: # Back
-                return (0, -self.speed, 0, 0)
-            case 6: # Left
-                return (self.speed, 0,0,0)
-            case 7: # Right
-                return (-self.speed, 0,0,0)
-            case 8: # Toggle follow
-                return self.follow(pose, image)
-            case 9: # Semicircle
-                return self.semicircle()
-            case 10: # change follow
-                return self.find_next_person()
-            case _:
-                return (0,0,0,0)
+
+        if self.follow_behaviour:
+            if gesture_id == 1:
+                self.follow_behaviour = not self.follow_behaviour
+            return self.follow(pose, image)
+        else:
+            match gesture_id:
+                case 0: # Forward
+                    return (0, self.speed, 0, 0)
+                case 1: # Stop
+                    self.follow_behaviour = not self.follow_behaviour
+                    return (0,0,0,0)
+                case 2: # Up
+                    return (0,0,self.speed, 0)
+                case 3: # Land
+                    self.follow_behaviour = not self.follow_behaviour
+                # case 3: # Land
+                #     return "land", 0 # TODO
+                case 4: # Down
+                    return (0,0,-self.speed, 0)
+                case 5: # Back
+                    return (0, -self.speed, 0, 0)
+                case 6: # Left
+                    return (self.speed, 0,0,0)
+                case 7: # Right
+                    return (-self.speed, 0,0,0)
+                case 8: # Toggle follow
+                    return self.follow(pose, image)
+                case 9: # Semicircle
+                    return self.semicircle()
+                case 10: # change follow
+                    return self.find_next_person()
+                case _:
+                    return (0,0,0,0)
     
     
-    def calculate_velocity(x, width):
+    def calculate_velocity(self, x, width):
         center = width / 2
         max_velocity = 50  # Maximum velocity for movements
         distance = abs(center - x)
@@ -53,6 +65,8 @@ class Instructions():
         return int(velocity)
 
     def follow(self, pose, image):
+        if pose is None:
+            return (0,0,0,0)
         height, width, _ = image.shape
         keypoints = [(int(lm.x * width), int(lm.y * height)) for lm in pose.pose_landmarks.landmark]
 
@@ -121,3 +135,8 @@ class Instructions():
         #     time.sleep(0.05)
 
         # drone.send_rc_control(0,0,0,0)
+
+    def find_next_person(self, pose, image):
+        if pose is None:
+            return (0,0,0,self.speed)
+        return (0,0,0,0)

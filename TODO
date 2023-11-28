@@ -1,1 +1,3 @@
+- add gesture buffer
 - add methods in each capability to add optional info to the image
+- file with default values to be read at start of program
