@@ -81,37 +81,45 @@ class Instructions():
         center_y = height / 2
         threshold_x = 0.1 * center_x  # Adjust as needed
         threshold_y = 0.1 * center_y  # Adjust as needed
+        min_distance_threshold = 50  # Minimum distance from the camera
+
         
         # Calculate velocities based on distance from the center
         velocity_x = self.calculate_velocity(nose_x, width)
         velocity_y = self.calculate_velocity((left_shoulder_y + right_shoulder_y) / 2, height)
+        velocity_z = self.calculate_velocity(nose_x, width)
+
+        distance_from_camera = abs(nose_x - left_shoulder_x)  # Example using nose and left shoulder x-coordinates
+    
+        # Check if the distance is below the minimum threshold
+        # if distance_from_camera < min_distance_threshold:
+        #     return (0, 0, 0, 0)  # Return no movement
         
         # Drone movement control based on pose keypoints
-        if nose_x < center_x - threshold_x:
-            return (velocity_x,0,0,0)
-            # drone.move_left(velocity_x)
-        elif nose_x > center_x + threshold_x:
-            # drone.move_right(velocity_x)
-            return (-velocity_x,0,0,0)
+        # if nose_x < center_x - threshold_x:
+        #     return (-velocity_x,0,0,0)
+        #     # drone.move_left(velocity_x)
+        # elif nose_x > center_x + threshold_x:
+        #     # drone.move_right(velocity_x)
+        #     return (velocity_x,0,0,0)
         
-        if nose_y < center_y - threshold_y:
-            return (0,0,velocity_y,0)
-            # drone.move_up(velocity_y)
-        elif nose_y > center_y + threshold_y:
-            return (0,0,-velocity_y,0)
-            # drone.move_down(velocity_y)
+        # if nose_y < center_y - threshold_y:
+        #     return (0,0,velocity_y,0)
+        #     # drone.move_up(velocity_y)
+        # elif nose_y > center_y + threshold_y:
+        #     return (0,0,-velocity_y,0)
+        #     # drone.move_down(velocity_y)
         
-        # Check for left and right hand movements for additional controls
-        if left_wrist_y < left_shoulder_y - threshold_y:
-            # drone.rotate_counter_clockwise(velocity_x)
-            return (0,0,0,velocity_x)
-        elif left_wrist_y > left_shoulder_y + threshold_y:
-            # drone.rotate_clockwise(velocity_x)
-            return (0,0,0,-velocity_x)
+        # # Check for left and right hand movements for additional controls
+        # if left_wrist_y < left_shoulder_y - threshold_y:
+        #     # drone.rotate_counter_clockwise(velocity_x)
+        #     return (0,0,0,velocity_x)
+        # elif left_wrist_y > left_shoulder_y + threshold_y:
+        #     # drone.rotate_clockwise(velocity_x)
+        #     return (0,0,0,-velocity_x)
         
         if right_wrist_y < right_shoulder_y - threshold_y:
             # drone.move_forward(velocity_x)
-            
             return (0,velocity_x,0,0)
         elif right_wrist_y > right_shoulder_y + threshold_y:
             # drone.move_back(velocity_x)
