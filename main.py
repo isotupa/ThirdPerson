@@ -34,22 +34,24 @@ def main():
 
             cv.imshow('Right Hand', right_hand_roi)
         
-        move = instructions.calculate_move(gesture, pose, image)
+        type_move, move = instructions.calculate_move(gesture, pose, image)
         print(move)
         
-        if not instructions.get_takeoff_state():
+        if not instructions.get_takeoff_state() and type_move == 'tuple':
             drone.execute_instruction(move)
+        elif type_move == 'land':
+            break
         cv.putText(image, f'{instructions.get_follow_state()}', (330, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
         cv.imshow('ThirdPerson', image)
         
         key = cv.waitKey(1)
         if key == ord('q'):
-            drone.terminate_drone()
-            mediapipe_utils.terminate_hands()
-            mediapipe_utils.terminate_pose()
             break
         elif key == ord(' '):
             drone.initialise_drone()
 
+    drone.terminate_drone()
+    mediapipe_utils.terminate_hands()
+    mediapipe_utils.terminate_pose()
 if __name__ == "__main__":
     main()
