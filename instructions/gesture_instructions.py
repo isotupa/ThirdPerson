@@ -1,12 +1,15 @@
 import time
 import math
+import numpy as np
 
 class Instructions():
     takeoff = False
-    follow_behaviour = False
+    follow_behaviour = True
     moving = False
     speed = 10
     previous_move = (0,0,0,0)
+    desired_distance = 300
+    forward_backward_threshold = 50
 
     def __init__(self, speed=10):
         self.speed = speed
@@ -58,11 +61,25 @@ class Instructions():
     
     def calculate_velocity(self, x, width):
         center = width / 2
-        max_velocity = 50  # Maximum velocity for movements
+        max_velocity = 100  # Maximum velocity for movements
         distance = abs(center - x)
         # Scale velocity based on the distance from the center
         velocity = max_velocity * (distance / center)
         return int(velocity)
+
+    def calculate_velocity_z(self, p1, p2):
+        distance = math.sqrt(p1*p1 + p2*p2)
+        threshold = self.forward_backward_threshold
+        desired_distance = self.desired_distance
+        max_speed = 100
+        max_distance = 600
+        if distance < desired_distance - threshold:
+            return -(max_speed - ((100 / desired_distance-threshold) * distance))
+        elif distance > desired_distance + threshold:
+            return ((max_speed / (max_distance - desired_distance+threshold)) * (distance - max_distance))
+        else:
+            return 0
+
 
     def follow(self, pose, image):
         if pose is None:
@@ -70,62 +87,54 @@ class Instructions():
         height, width, _ = image.shape
         keypoints = [(int(lm.x * width), int(lm.y * height)) for lm in pose.pose_landmarks.landmark]
 
+        # Calculate speed based on the difference between current distance and desired distance
         nose_x, nose_y = keypoints[0] if keypoints else (0, 0)
+        neck_x, neck_y = keypoints[12] if keypoints else (0,0)
         left_shoulder_x, left_shoulder_y = keypoints[11] if keypoints else (0, 0)
         right_shoulder_x, right_shoulder_y = keypoints[12] if keypoints else (0, 0)
         left_wrist_x, left_wrist_y = keypoints[7] if keypoints else (0, 0)
         right_wrist_x, right_wrist_y = keypoints[4] if keypoints else (0, 0)
+        hip_x, _ = keypoints[24] if keypoints else (0, 0)
         
         # Define thresholds for movement detection
         center_x = width / 2
         center_y = height / 2
         threshold_x = 0.1 * center_x  # Adjust as needed
         threshold_y = 0.1 * center_y  # Adjust as needed
-        min_distance_threshold = 50  # Minimum distance from the camera
-
         
         # Calculate velocities based on distance from the center
         velocity_x = self.calculate_velocity(nose_x, width)
         velocity_y = self.calculate_velocity((left_shoulder_y + right_shoulder_y) / 2, height)
-        velocity_z = self.calculate_velocity(nose_x, width)
+        # print(self.calculate_velocity_z(left_shoulder_x, right_shoulder_x))
 
-        distance_from_camera = abs(nose_x - left_shoulder_x)  # Example using nose and left shoulder x-coordinates
-    
-        # Check if the distance is below the minimum threshold
-        # if distance_from_camera < min_distance_threshold:
-        #     return (0, 0, 0, 0)  # Return no movement
-        
+        result = list((0,0,0,0))
+
         # Drone movement control based on pose keypoints
-        # if nose_x < center_x - threshold_x:
-        #     return (-velocity_x,0,0,0)
-        #     # drone.move_left(velocity_x)
-        # elif nose_x > center_x + threshold_x:
-        #     # drone.move_right(velocity_x)
-        #     return (velocity_x,0,0,0)
+        if nose_x < center_x - threshold_x:
+            result[0] = -velocity_x
+            result[3] = -velocity_x
+            # return (-velocity_x,0,0,-velocity_x)
+            # drone.move_left(velocity_x)
+        elif nose_x > center_x + threshold_x:
+            result[0] = velocity_x
+            result[3] = velocity_x
+            # drone.move_right(velocity_x)
+            # return (velocity_x,0,0,velocity_x)
         
-        # if nose_y < center_y - threshold_y:
-        #     return (0,0,velocity_y,0)
-        #     # drone.move_up(velocity_y)
-        # elif nose_y > center_y + threshold_y:
-        #     return (0,0,-velocity_y,0)
-        #     # drone.move_down(velocity_y)
-        
-        # # Check for left and right hand movements for additional controls
-        # if left_wrist_y < left_shoulder_y - threshold_y:
-        #     # drone.rotate_counter_clockwise(velocity_x)
-        #     return (0,0,0,velocity_x)
-        # elif left_wrist_y > left_shoulder_y + threshold_y:
-        #     # drone.rotate_clockwise(velocity_x)
-        #     return (0,0,0,-velocity_x)
-        
-        if right_wrist_y < right_shoulder_y - threshold_y:
-            # drone.move_forward(velocity_x)
-            return (0,velocity_x,0,0)
-        elif right_wrist_y > right_shoulder_y + threshold_y:
-            # drone.move_back(velocity_x)
-            return (0,-velocity_x,0,0)
+        if nose_y < center_y - threshold_y:
+            result[2] = velocity_y
+            # return (0,0,velocity_y,0)
+            # drone.move_up(velocity_y)
+        elif nose_y > center_y + threshold_y:
+            result[2] = -velocity_y
+            # return (0,0,-velocity_y,0)
+            # drone.move_down(velocity_y)
+        # print(f'p1: {nose_x}, p2: {neck_x}')
 
-        return (0,0,0,0)
+        calc = self.calculate_velocity_z(nose_y, neck_y)
+        result[1] = int(calc)
+
+        return tuple(result)
 
 
     

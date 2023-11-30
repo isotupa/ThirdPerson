@@ -9,6 +9,7 @@ import cv2 as cv
 
 def main():
     drone = webcam_drone.WebcamSimulationController()
+    # drone = tello_drone.TelloDroneController()
     drone.connect_to_drone()
 
     mediapipe_utils.initialise_hands()
