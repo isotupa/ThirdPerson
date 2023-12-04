@@ -1,13 +1,13 @@
-Stop -> Fist
-Forward -> Palm towards the drone
-Backward -> Palm with knuckles towards the drone
-Up -> Thumbs up
-Down -> Thumbs down
-Left -> Thumbs Left
-Right -> Thumbs Right
-Surf -> Roll
-Ok -> Land
-Follow
-Circle
-Change follow
-takeoff?
+Forward -> Palm towards the drone (0)
+Stop -> Fist (1)
+Up -> Thumbs up (hacer) (2)
+Ok -> Land (3)
+Down -> Thumbs down (hacer) (4)
+Backward -> Palm with knuckles towards the drone (hacer) (5)
+Left -> Thumbs Left (6)
+Right -> Thumbs Right (7)
+Follow -> You (hacer) (8)
+Circle -> Cross maomenos (9)
+Change follow -> Fist with knuckles visible (5 del pibe)
+Surf -> Roll (hacer)
+takeoff? no

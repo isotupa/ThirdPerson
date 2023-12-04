@@ -9,6 +9,8 @@ mp_hands = mp.solutions.hands
 constant_width = 300
 constant_height = 300
 
+safe_zone = True
+
 global pose
 global hands
 
@@ -108,8 +110,9 @@ def extract_hand_region(image, pose_results):
     wrist_y = int(wrist_landmark.y * image_height)
     
     # Display right hand pixels in a new window
-    if right_hand_region.shape[0] > 0 and right_hand_region.shape[1] > 0 and wrist_y < elbow_y:
-        # Display right hand pixels in a new window
-        right_hand_region_resized = cv.resize(right_hand_region, (constant_width, constant_height))
+    if right_hand_region.shape[0] > 0 and right_hand_region.shape[1] > 0:
+        # Display right hand pixels in a new windo
+        if wrist_y < elbow_y or safe_zone:
+            right_hand_region_resized = cv.resize(right_hand_region, (constant_width, constant_height))
         return right_hand_region_resized
     return None

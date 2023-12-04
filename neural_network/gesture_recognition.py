@@ -6,7 +6,7 @@ import numpy as np
 
 def recognize_gesture(results, debug_image):
     gesture = -1
-    keypoint_classifier, keypoint_classifier_labels = load_model()
+    keypoint_classifier, keypoint_classifier_labels = load_model() # TODO: don't load model everytime
     for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
         landmark_list = calc_landmark_list(debug_image, hand_landmarks)
         pre_processed_landmark_list = pre_process_landmark(landmark_list)
@@ -65,6 +65,8 @@ def load_model(model_path='model/keypoint_classifier.tflite'):
         keypoint_classifier_labels = [
             row[0] for row in keypoint_classifier_labels
         ]
+    
+    # print(keypoint_classifier_labels)
 
     return keypoint_classifier, keypoint_classifier_labels
 

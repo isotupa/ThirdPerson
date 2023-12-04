@@ -38,6 +38,12 @@ class TelloDroneController(DroneController):
         if self.drone:
             threading.Thread(target=self.drone.send_rc_control, args=move).start()
 
+    def execute_roll(self):
+        self.drone.flip_left()
+
+    def get_battery(self):
+        return self.drone.get_battery()
+
 
 '''
 class TelloDroneController(DroneController):

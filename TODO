@@ -1,4 +1,8 @@
-- add gesture buffer
++ add gesture buffer 
 - add methods in each capability to add optional info to the image
 - file with default values to be read at start of program
 - fix hands detection issues
++ get_battery()
+- if face points not detected -> bug
++ add roll
++ limit pose detection to 1

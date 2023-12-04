@@ -25,3 +25,9 @@ class WebcamSimulationController(DroneController):
 
     def execute_instruction(self, move):
         pass
+
+    def execute_roll(self):
+        pass
+
+    def get_battery(self):
+        return 100

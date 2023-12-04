@@ -20,6 +20,8 @@ def main():
     
     while True:
         image = drone.get_camera_image()
+        battery = drone.get_battery()
+        # print(battery)
 
         gesture = -1
         
@@ -30,17 +32,20 @@ def main():
             buffer.add_gesture(gesture)
             gesture = buffer.get_gesture()
             
-            cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (150,0,0), 2)
+            cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
 
             cv.imshow('Right Hand', right_hand_roi)
         
         type_move, move = instructions.calculate_move(gesture, pose, image)
         print(move)
         
-        if not instructions.get_takeoff_state() and type_move == 'tuple':
+        # if not instructions.get_takeoff_state() and type_move == 'tuple':
+        if type_move == 'tuple':
             drone.execute_instruction(move)
         elif type_move == 'land':
             break
+        elif type_move == 'roll':
+            drone.execute_roll()
         cv.putText(image, f'{instructions.get_follow_state()}', (330, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
         cv.imshow('ThirdPerson', image)
         

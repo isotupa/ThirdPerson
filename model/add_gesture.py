@@ -5,23 +5,17 @@ import copy
 import itertools
 
 
-csv_path = 'gestures/data.csv'
+NUMBER = 11
+csv_path = 'model/new_gestures.csv'
 global i
 i = 0
 global writer
 
 # Define the action to be executed when spacebar is pressed
-def execute_action(image, mode):
+def execute_action(image, results):
     global i
     global writer
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(
-        max_num_hands=1,
-        min_detection_confidence=0.7,
-        min_tracking_confidence=0.7,
-    )
 
-    results = hands.process(image)
     if results.multi_hand_landmarks is not None:
         for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
                                                 results.multi_handedness):
@@ -36,11 +30,10 @@ def execute_action(image, mode):
 
             # Write to the dataset file
             # threading.Thread(target=writer.writerow, args=[mode, *pre_processed_landmark_list]).start()
-            writer.writerow([mode, *pre_processed_landmark_list])
+            writer.writerow([NUMBER, *pre_processed_landmark_list])
             print("WRITE " + str(i))
             i += 1
 
-            # _logging_csv(mode, pre_processed_landmark_list)
 
 def _calc_landmark_list(image, landmarks):
     image_width, image_height = image.shape[1], image.shape[0]
@@ -56,15 +49,6 @@ def _calc_landmark_list(image, landmarks):
         landmark_point.append([landmark_x, landmark_y])
 
     return landmark_point
-
-def _logging_csv(number, landmark_list):
-    global i
-    i += 1
-    print("WRITE " + str(i))
-    with open(csv_path, 'a', newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([number, *landmark_list])
-    return
 
 
 
@@ -99,14 +83,13 @@ cap = cv2.VideoCapture(0)
 
 with open(csv_path, 'a', newline="") as f:
     writer = csv.writer(f)
+    mp_drawing = mp.solutions.drawing_utils
+    mp_hands = mp.solutions.hands
 
     while True:
         # Read a frame from the webcam feed
         ret, frame = cap.read()
-
-
-        mp_drawing = mp.solutions.drawing_utils
-        mp_hands = mp.solutions.hands
+        results = None
 
         with mp_hands.Hands(
             min_detection_confidence=0.5,
@@ -134,8 +117,8 @@ with open(csv_path, 'a', newline="") as f:
         key = cv2.waitKey(1)
 
         # If the spacebar is pressed, execute the action
-        if key == ord(' '):
-            execute_action(frame, 4)
+        if key == ord(' ') and results.multi_hand_landmarks:
+            execute_action(frame, results)
 
         # If the 'q' key is pressed, exit the loop
         elif key == ord('q'):
