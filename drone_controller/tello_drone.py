@@ -26,6 +26,7 @@ class TelloDroneController(DroneController):
         if self.drone:
             self.drone.takeoff()
             self.takeoff = True
+            self.drone.move_up(50)
 
     def terminate_drone(self):
         if self.drone:

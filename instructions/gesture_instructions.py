@@ -5,14 +5,14 @@ import cv2 as cv
 
 class Instructions():
     takeoff = False
-    follow_behaviour = True
+    follow_behaviour = False
     moving = False
     previous_move = (0,0,0,0)
     desired_distance = 200
     forward_backward_threshold = 25
 
 
-    def __init__(self, speed=10, width=1000, height=500):
+    def __init__(self, speed=40, width=1000, height=500):
         self.speed = speed
         self.width = width
         self.height = height
@@ -86,7 +86,7 @@ class Instructions():
                 return 'tuple', (0,0,0,0)
                 return 'tuple', self.find_next_person()
             case 11: # roll
-                return 'tuple', (0,0,0,0)
+                # return 'tuple', (0,0,0,0)
                 return 'roll', None
             case _:
                 return 'tuple', (0,0,0,0)
@@ -135,7 +135,7 @@ class Instructions():
         else:
             velocity = 0
 
-        return velocity
+        return -velocity
 
     def follow(self, pose, image):
         if pose is None:

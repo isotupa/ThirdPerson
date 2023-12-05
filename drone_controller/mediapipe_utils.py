@@ -25,12 +25,12 @@ def extract_pose_and_hands(image):
         return pose_results, None, None
     return None, None, None
 
-def initialise_pose(min_detection_confidence=0.5, min_tracking_confidence=0.5):
+def initialise_pose(min_detection_confidence=0.6, min_tracking_confidence=0.3):
     global pose
     pose = mp_pose.Pose(min_detection_confidence=min_detection_confidence,
                          min_tracking_confidence=min_tracking_confidence)
     
-def initialise_hands(min_detection_confidence=0.5, min_tracking_confidence=0.5):
+def initialise_hands(min_detection_confidence=0.4, min_tracking_confidence=0.3):
     global hands
     hands = mp_hands.Hands(min_detection_confidence=min_detection_confidence,
                          min_tracking_confidence=min_tracking_confidence) 
@@ -42,21 +42,33 @@ def terminate_hands():
     hands.close()
 
 def extract_hands(image):
+    if image is None:
+        return None
     hands_result = hands.process(image)
+    return hands_result
+    
+def draw_hands(image, hands_result):
+    if image is None or hands_result is None:
+        return None
     if hands_result.multi_hand_landmarks:
         for hand_landmarks in hands_result.multi_hand_landmarks:
             mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-        return hands_result
-
-# Image must be RGB for optimal detection
 def extract_pose(image):
-    pose_results = pose.process(image)
+    if image is not None:
+        pose_results = pose.process(image)
+        return pose_results
+    return None
+
+def draw_pose(image, pose_results):
     if pose_results.pose_landmarks:
         mp_drawing.draw_landmarks(image, pose_results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-    return pose_results
 
 def extract_hand_region(image, pose_results):
+    if image is None:
+        return None
+    if pose_results is None or pose_results.pose_landmarks is None:
+        return np.zeros((constant_height, constant_width, 3), np.uint8)
 
     left_hand_indices = [15, 17, 19, 21]
     right_hand_indices = [16, 18, 20, 22]
@@ -94,13 +106,13 @@ def extract_hand_region(image, pose_results):
     right_hand_y = max(0, int(right_hand_centroid[1] - right_hand_h // 2))
 
     # Extract regions within the rectangles
-    left_hand_region = image[left_hand_y:left_hand_y + left_hand_h, left_hand_x:left_hand_x + left_hand_w]
-    right_hand_region = image[right_hand_y:right_hand_y + right_hand_h, right_hand_x:right_hand_x + right_hand_w]
+    # left_hand_region = image[left_hand_y:left_hand_y + left_hand_h, left_hand_x:left_hand_x + left_hand_w]
+    right_hand_region = image.copy()[right_hand_y:right_hand_y + right_hand_h, right_hand_x:right_hand_x + right_hand_w]
 
     # cv.rectangle(image, (left_hand_x, left_hand_y), (left_hand_x + left_hand_w, left_hand_y + left_hand_h),
     #                 (0, 255, 0), 2)
-    # cv.rectangle(image, (right_hand_x, right_hand_y),
-    #                 (right_hand_x + right_hand_w, right_hand_y + right_hand_h), (0, 255, 0), 2)
+    cv.rectangle(image, (right_hand_x, right_hand_y),
+                    (right_hand_x + right_hand_w, right_hand_y + right_hand_h), (0, 255, 0), 2)
 
     elbow_landmark = pose_results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW]
     wrist_landmark = pose_results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]
@@ -114,5 +126,6 @@ def extract_hand_region(image, pose_results):
         # Display right hand pixels in a new windo
         if wrist_y < elbow_y or safe_zone:
             right_hand_region_resized = cv.resize(right_hand_region, (constant_width, constant_height))
-        return right_hand_region_resized
-    return None
+            return right_hand_region_resized
+
+    return np.zeros((constant_height, constant_width, 3), np.uint8)
