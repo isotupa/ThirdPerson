@@ -5,7 +5,26 @@ from neural_network import gesture_recognition
 from instructions import gesture_instructions
 from instructions import gesture_buffer
 import cv2 as cv
+# import time
 
+
+def control(key, tello):
+    if key == ord('w'):
+        tello.move_forward(30)
+    elif key == ord('s'):
+        tello.move_back(30)
+    elif key == ord('a'):
+        tello.move_left(30)
+    elif key == ord('d'):
+        tello.move_right(30)
+    elif key == ord('e'):
+        tello.rotate_clockwise(30)
+    elif key == ord('q'):
+        tello.rotate_counter_clockwise(30)
+    elif key == ord('r'):
+        tello.move_up(30)
+    elif key == ord('f'):
+        tello.move_down(30)
 
 def main():
     # drone = webcam_drone.WebcamSimulationController()
@@ -16,12 +35,17 @@ def main():
     mediapipe_utils.initialise_pose()
 
     instructions = gesture_instructions.Instructions()
-    buffer = gesture_buffer.GestureBuffer()
+    buffer = gesture_buffer.GestureBuffer(buffer_len=5)
 
     gesture_recognizer = gesture_recognition.GestureRecognizer()
 
+    # desired_fps = 15
+    # interval = 1.0 / desired_fps
+
     
     while True:
+        # start_time = time.time()
+
         image = drone.get_camera_image()
         battery = drone.get_battery()
         print(battery)
@@ -45,18 +69,6 @@ def main():
             cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
             cv.imshow('Right hand', right_hand_roi)
 
-        
-        # pose, hands, right_hand_roi = mediapipe_utils.extract_pose_and_hands(image)
-        # if hands:
-        #     gesture, labels = gesture_recognition.recognize_gesture(hands, right_hand_roi)
-        #     gesture_name = gesture_recognition.translate_gesture_id_to_name(gesture, labels)
-        #     buffer.add_gesture(gesture)
-        #     gesture = buffer.get_gesture()
-            
-        #     cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
-
-        #     cv.imshow('Right Hand', right_hand_roi)
-        
         type_move, move = instructions.calculate_move(gesture, pose_results, image)
         print(move)
         
@@ -73,6 +85,12 @@ def main():
             break
         elif key == ord(' '):
             drone.initialise_drone()
+        else:
+            control(key, drone.get_drone())
+        
+        # elapsed_time = time.time() - start_time
+        # time_to_wait = max(0, interval - elapsed_time)
+        # time.sleep(time_to_wait)
 
     drone.terminate_drone()
     mediapipe_utils.terminate_hands()

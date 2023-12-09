@@ -26,70 +26,70 @@ class Instructions():
         return self.takeoff
 
     def calculate_move(self, gesture_id, pose, image):
-        if gesture_id == None:
-            return 'tuple', (0,0,0,0)
+        # if gesture_id == None:
+        #     return 'tuple', (0,0,0,0)
 
-        if self.follow_behaviour:
-            match gesture_id:
-                case 0: # Forward
-                    self.desired_distance += 10
-                case 1: # Stop
-                    self.follow_behaviour = not self.follow_behaviour
-                case 2: # Up
-                    self.center_y += 10
-                case 3: # Land
-                    return 'land', None
-                case 4: # Down
-                    self.center_y -= 10
-                case 5: # Back
-                    self.desired_distance -= 10
-                case 6: # Left
-                    self.center_x += 10
-                case 7: # Right
-                    self.center_x -= 10
-                case 8: # Toggle follow
-                    self.follow_behaviour = not self.follow_behaviour
-                case 9: # Semicircle
-                    self.follow_behaviour = not self.follow_behaviour
-                    return 'tuple', self.semicircle()
-                case 10: # change follow
-                    self.follow_behaviour = not self.follow_behaviour
-                    return 'tuple', self.find_next_person()
-                case 11: # roll
-                    return 'roll', None
-            return 'tuple', self.follow(pose, image)
+        # if self.follow_behaviour:
+        #     match gesture_id:
+        #         case 0: # Forward
+        #             self.desired_distance += 10
+        #         case 1: # Stop
+        #             self.follow_behaviour = not self.follow_behaviour
+        #         case 2: # Up
+        #             self.center_y += 10
+        #         case 3: # Land
+        #             return 'land', None
+        #         case 4: # Down
+        #             self.center_y -= 10
+        #         case 5: # Back
+        #             self.desired_distance -= 10
+        #         case 6: # Left
+        #             self.center_x += 10
+        #         case 7: # Right
+        #             self.center_x -= 10
+        #         case 8: # Toggle follow
+        #             self.follow_behaviour = not self.follow_behaviour
+        #         case 9: # Semicircle
+        #             self.follow_behaviour = not self.follow_behaviour
+        #             return 'tuple', self.semicircle()
+        #         case 10: # change follow
+        #             self.follow_behaviour = not self.follow_behaviour
+        #             return 'tuple', self.find_next_person()
+        #         case 11: # roll
+        #             return 'roll', None
+        #     return 'tuple', self.follow(pose, image)
 
+        move = self.previous_move
         match gesture_id:
             case 0: # Forward
-                return 'tuple', (0, self.speed, 0, 0)
+                move = (0, self.speed, 0, 0)
             case 1: # Stop
-                return 'tuple', (0,0,0,0)
+                move = (0,0,0,0)
             case 2: # Up
-                return 'tuple', (0,0,self.speed, 0)
+                move = (0,0,self.speed, 0)
             case 3: # Land
                 return 'land', None
             case 4: # Down
-                return 'tuple', (0,0,-self.speed, 0)
+                move = (0,0,-self.speed, 0)
             case 5: # Back
-                return 'tuple', (0, -self.speed, 0, 0)
+                move = (0, -self.speed, 0, 0)
             case 6: # Left
-                return 'tuple', (self.speed, 0,0,0)
+                move = (self.speed, 0,0,0)
             case 7: # Right
-                return 'tuple', (-self.speed, 0,0,0)
+                move = (-self.speed, 0,0,0)
             case 8: # Toggle follow
                 self.follow_behaviour = not self.follow_behaviour
-                return 'tuple', self.follow(pose, image)
+                move = self.follow(pose, image)
             case 9: # Semicircle
-                return 'tuple', (0,0,0,0)
-                return 'tuple', self.semicircle()
+                move = (0,0,0,0)
             case 10: # change follow
                 return 'tuple', (0,0,0,0)
                 return 'tuple', self.find_next_person()
             case 11: # roll
                 # return 'tuple', (0,0,0,0)
                 return 'roll', None
-            case _:
-                return 'tuple', (0,0,0,0)
+        self.previous_move = move
+        return 'tuple', move
     
     
     def calculate_velocity(self, x, width):
@@ -138,7 +138,7 @@ class Instructions():
         return -velocity
 
     def follow(self, pose, image):
-        if pose is None:
+        if pose is None or pose.pose_landmarks is None:
             return (0,0,0,0)
         height, width, _ = image.shape
         keypoints = [(int(lm.x * width), int(lm.y * height)) for lm in pose.pose_landmarks.landmark]
