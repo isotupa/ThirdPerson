@@ -12,7 +12,7 @@ class GestureRecognizer(object):
         gesture = -1
 
         # if results is None or debug_image is None or results.multi_hand_landmarks is None:
-        if results is None or debug_image is None or len(results.hand_landmarks) == 0:
+        if results is None or debug_image is None or results is None or not hasattr(results, 'hand_landmarks'):
             return gesture, self.keypoint_classifier_labels
 
         # for hand_landmarks in results.multi_hand_landmarks:

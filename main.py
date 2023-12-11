@@ -32,11 +32,13 @@ def main():
     # drone = tello_drone.TelloDroneController()
     drone.connect_to_drone()
 
-    mediapipe_utils.initialise_hands()
-    mediapipe_utils.initialise_pose()
+    hand_detection = mediapipe_utils.HandDetection()
+
+    hand_detection.initialise_hands()
+    hand_detection.initialise_pose()
 
     instructions = gesture_instructions.Instructions()
-    buffer = gesture_buffer.GestureBuffer(buffer_len=5)
+    buffer = gesture_buffer.GestureBuffer(buffer_len=10)
 
     gesture_recognizer = gesture_recognition.GestureRecognizer()
 
@@ -49,16 +51,16 @@ def main():
 
         image = drone.get_camera_image()
         battery = drone.get_battery()
-        print(battery)
+        # print(battery)
 
         gesture = -1
 
-        pose_results = mediapipe_utils.extract_pose(image)
-        right_hand_roi = mediapipe_utils.extract_hand_region(image, pose_results)
-        hands_results = mediapipe_utils.extract_hands(right_hand_roi)
+        pose_results = hand_detection.extract_pose(image)
+        right_hand_roi = hand_detection.extract_hand_region(image, pose_results)
+        hands_results = hand_detection.extract_hands(right_hand_roi)
         # right_hand = mediapipe_utils.draw_hands(right_hand_roi, hands_results)
-        debug_image = mediapipe_utils.draw_landmarks_on_image(right_hand_roi, hands_results)
-        mediapipe_utils.draw_pose(image, pose_results)
+        debug_image = hand_detection.draw_landmarks_on_image(right_hand_roi, hands_results)
+        hand_detection.draw_pose(image, pose_results)
         gesture_id, labels = gesture_recognizer.recognize_gesture(hands_results, image)
         gesture_name = gesture_recognizer.translate_gesture_id_to_name(gesture_id)
         buffer.add_gesture(gesture_id)
@@ -97,8 +99,8 @@ def main():
         # time.sleep(time_to_wait)
 
     drone.terminate_drone()
-    mediapipe_utils.terminate_hands()
-    mediapipe_utils.terminate_pose()
+    hand_detection.terminate_hands()
+    hand_detection.terminate_pose()
 
 
 if __name__ == "__main__":
