@@ -56,7 +56,8 @@ def main():
         pose_results = mediapipe_utils.extract_pose(image)
         right_hand_roi = mediapipe_utils.extract_hand_region(image, pose_results)
         hands_results = mediapipe_utils.extract_hands(right_hand_roi)
-        mediapipe_utils.draw_hands(right_hand_roi, hands_results)
+        # right_hand = mediapipe_utils.draw_hands(right_hand_roi, hands_results)
+        debug_image = mediapipe_utils.draw_landmarks_on_image(right_hand_roi, hands_results)
         mediapipe_utils.draw_pose(image, pose_results)
         gesture_id, labels = gesture_recognizer.recognize_gesture(hands_results, image)
         gesture_name = gesture_recognizer.translate_gesture_id_to_name(gesture_id)
@@ -67,8 +68,9 @@ def main():
         cv.putText(image, f'{instructions.get_follow_state()}', (330, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
         cv.imshow('ThirdPerson', image)
         if right_hand_roi is not None:
-            cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
-            cv.imshow('Right hand', right_hand_roi)
+            # cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
+            # cv.putText(debug_image, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
+            cv.imshow('Right hand', debug_image)
 
         type_move, move = instructions.calculate_move(gesture, pose_results, image)
         print(move)
@@ -98,6 +100,6 @@ def main():
     mediapipe_utils.terminate_hands()
     mediapipe_utils.terminate_pose()
 
-    
+
 if __name__ == "__main__":
     main()

@@ -11,10 +11,12 @@ class GestureRecognizer(object):
     def recognize_gesture(self, results, debug_image):
         gesture = -1
 
-        if results is None or debug_image is None or results.multi_hand_landmarks is None:
+        # if results is None or debug_image is None or results.multi_hand_landmarks is None:
+        if results is None or debug_image is None or len(results.hand_landmarks) == 0:
             return gesture, self.keypoint_classifier_labels
 
-        for hand_landmarks in results.multi_hand_landmarks:
+        # for hand_landmarks in results.multi_hand_landmarks:
+        for hand_landmarks in results.hand_landmarks:
             landmark_list = self.calc_landmark_list(debug_image, hand_landmarks)
             pre_processed_landmark_list = self.pre_process_landmark(landmark_list)
             hand_sign_id = self.keypoint_classifier(pre_processed_landmark_list)
@@ -33,7 +35,8 @@ class GestureRecognizer(object):
         landmark_point = []
 
         # Keypoint
-        for _, landmark in enumerate(landmarks.landmark):
+        # for _, landmark in enumerate(landmarks.landmark):
+        for landmark in landmarks:
             landmark_x = min(int(landmark.x * image_width), image_width - 1)
             landmark_y = min(int(landmark.y * image_height), image_height - 1)
 
