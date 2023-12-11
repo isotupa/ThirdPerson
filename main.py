@@ -1,6 +1,5 @@
 from drone_controller import tello_drone
 from drone_controller import webcam_drone
-from drone_controller import mediapipe_utils
 from neural_network import gesture_recognition
 from instructions import gesture_instructions
 from instructions import gesture_buffer

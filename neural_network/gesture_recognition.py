@@ -5,8 +5,8 @@ import tensorflow as tf
 import numpy as np
 
 class GestureRecognizer(object):
-    def __init__(self):
-        self.keypoint_classifier, self.keypoint_classifier_labels = self.load_model()
+    def __init__(self, model_path='model/keypoint_classifier.tflite', label_path='model/keypoint_classifier_label.csv'):
+        self.keypoint_classifier, self.keypoint_classifier_labels = self.load_model(model_path=model_path, label_path=label_path)
 
     def recognize_gesture(self, results, debug_image):
         gesture = -1
@@ -63,10 +63,10 @@ class GestureRecognizer(object):
 
         return temp_point_history
 
-    def load_model(self, model_path='model/keypoint_classifier.tflite'):
+    def load_model(self, model_path, label_path):
         self.keypoint_classifier = KeyPointClassifier(model_path=model_path)
 
-        with open('model/keypoint_classifier_label.csv', encoding='utf-8-sig') as f:
+        with open(label_path, encoding='utf-8-sig') as f:
             keypoint_classifier_labels = csv.reader(f)
             self.keypoint_classifier_labels = [row[0] for row in keypoint_classifier_labels]
 
@@ -99,7 +99,7 @@ class GestureRecognizer(object):
 
 
 class KeyPointClassifier(object):
-    def __init__(self, model_path='model/keypoint_classifier.tflite', num_threads=1):
+    def __init__(self, model_path, num_threads=1):
         self.interpreter = tf.lite.Interpreter(model_path=model_path, num_threads=num_threads)
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()

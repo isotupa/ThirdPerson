@@ -3,27 +3,85 @@ import mediapipe as mp
 import csv
 import copy
 import itertools
+import time
+import numpy as np
 
+from mediapipe.framework.formats import landmark_pb2
 
-NUMBER = 11
-csv_path = 'model/new_gestures.csv'
-global i
+NUMBER = 20
 i = 0
-global writer
 
-# Define the action to be executed when spacebar is pressed
-def execute_action(image, results):
+class landmarker_and_result():
+
+    def __init__(self):
+        self.result = mp.tasks.vision.HandLandmarkerResult
+        self.landmarker = mp.tasks.vision.HandLandmarker
+        self.createLandmarker()
+    
+    def createLandmarker(self):
+        # callback function
+        def update_result(result: mp.tasks.vision.HandLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
+            self.result = result
+
+        options = mp.tasks.vision.HandLandmarkerOptions( 
+            base_options = mp.tasks.BaseOptions(model_asset_path="model/hand_landmarker.task"), # path to model
+            running_mode = mp.tasks.vision.RunningMode.LIVE_STREAM, # running on a live stream
+            num_hands = 1, # track both hands
+            min_hand_detection_confidence = 0.3, # lower than value to get predictions more often
+            min_hand_presence_confidence = 0.3, # lower than value to get predictions more often
+            min_tracking_confidence = 0.3, # lower than value to get predictions more often
+            result_callback=update_result)
+        
+        # initialize landmarker
+        self.landmarker = self.landmarker.create_from_options(options)
+    
+    def detect_async(self, frame):
+        # convert np frame to mp image
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+        # detect landmarks
+        self.landmarker.detect_async(image = mp_image, timestamp_ms = int(time.time() * 1000))
+
+    def close(self):
+        # close landmarker
+        self.landmarker.close()
+
+def draw_landmarks_on_image(rgb_image, detection_result: mp.tasks.vision.HandLandmarkerResult):
+   try:
+      if detection_result.hand_landmarks == []:
+         return rgb_image
+      else:
+         hand_landmarks_list = detection_result.hand_landmarks
+         handedness_list = detection_result.handedness
+         annotated_image = np.copy(rgb_image)
+
+         # Loop through the detected hands to visualize.
+         for idx in range(len(hand_landmarks_list)):
+            hand_landmarks = hand_landmarks_list[idx]
+            
+            # Draw the hand landmarks.
+            hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+            hand_landmarks_proto.landmark.extend([
+               landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks])
+            mp.solutions.drawing_utils.draw_landmarks(
+               annotated_image,
+               hand_landmarks_proto,
+               mp.solutions.hands.HAND_CONNECTIONS,
+               mp.solutions.drawing_styles.get_default_hand_landmarks_style(),
+               mp.solutions.drawing_styles.get_default_hand_connections_style())
+
+         return annotated_image
+   except:
+      return rgb_image
+
+def add_to_csv(image, results, writer):
     global i
-    global writer
-
-    if results.multi_hand_landmarks is not None:
-        for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
-                                                results.multi_handedness):
-            landmark_list = _calc_landmark_list(image, hand_landmarks)
+    if results.hand_landmarks is not None:
+        for hand_landmarks in results.hand_landmarks:
+            landmark_list = calc_landmark_list(image, hand_landmarks)
             # print(landmark_list)
 
             # Conversion to relative coordinates / normalized coordinates
-            pre_processed_landmark_list = _pre_process_landmark(
+            pre_processed_landmark_list = pre_process_landmark(
                 landmark_list)
             
             # print(pre_processed_landmark_list)
@@ -34,14 +92,13 @@ def execute_action(image, results):
             print("WRITE " + str(i))
             i += 1
 
-
-def _calc_landmark_list(image, landmarks):
+def calc_landmark_list(image, landmarks):
     image_width, image_height = image.shape[1], image.shape[0]
 
     landmark_point = []
 
     # Keypoint
-    for _, landmark in enumerate(landmarks.landmark):
+    for landmark in landmarks:
         landmark_x = min(int(landmark.x * image_width), image_width - 1)
         landmark_y = min(int(landmark.y * image_height), image_height - 1)
         # landmark_z = landmark.z
@@ -51,8 +108,7 @@ def _calc_landmark_list(image, landmarks):
     return landmark_point
 
 
-
-def _pre_process_landmark(landmark_list):
+def pre_process_landmark(landmark_list):
     temp_landmark_list = copy.deepcopy(landmark_list)
 
     # Convert to relative coordinates
@@ -77,53 +133,33 @@ def _pre_process_landmark(landmark_list):
     temp_landmark_list = list(map(normalize_, temp_landmark_list))
 
     return temp_landmark_list
-
-# Open the webcam feed
 cap = cv2.VideoCapture(0)
+
+# create landmarker
+hand_landmarker = landmarker_and_result()
+csv_path = 'model/new_gestures.csv'
 
 with open(csv_path, 'a', newline="") as f:
     writer = csv.writer(f)
-    mp_drawing = mp.solutions.drawing_utils
-    mp_hands = mp.solutions.hands
-
     while True:
-        # Read a frame from the webcam feed
+        # pull frame
         ret, frame = cap.read()
-        results = None
+        # mirror frame
+        frame = cv2.flip(frame, 1)
+        # update landmarker results
+        hand_landmarker.detect_async(frame)
+        # draw landmarks on frame
+        frame = draw_landmarks_on_image(frame,hand_landmarker.result)
 
-        with mp_hands.Hands(
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5) as hands:
-
-            # Convert the frame to RGB
-            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-            # Flip the image horizontally for a later selfie-view display
-            image = cv2.flip(image, 1)
-
-            # Set the flag to draw the hand landmarks
-            results = hands.process(image)
-            if results.multi_hand_landmarks:
-                for hand_landmarks in results.multi_hand_landmarks:
-                    mp_drawing.draw_landmarks(
-                        image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-
-
-        # Show the frame in a window named "Webcam Feed"
-        cv2.imshow("Webcam Feed", image)
-
-        # Wait for a key to be pressed
+        # display image
+        cv2.imshow('frame',frame)
         key = cv2.waitKey(1)
-
-        # If the spacebar is pressed, execute the action
-        if key == ord(' ') and results.multi_hand_landmarks:
-            execute_action(frame, results)
-
-        # If the 'q' key is pressed, exit the loop
-        elif key == ord('q'):
+        if key == ord('q'):
             break
-
-    # Release the webcam and close all windows
+        elif key == ord(' '):
+            add_to_csv(frame, hand_landmarker.result, writer)
+    
+    # release everything
+hand_landmarker.close()
 cap.release()
 cv2.destroyAllWindows()
