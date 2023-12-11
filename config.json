@@ -3,11 +3,11 @@
         "pose_landmarker": "model/pose_landmarker_heavy.task",
         "gesture_recogniser": "model/keypoint_classifier.tflite",
         "hand_landmarker": "model/hand_landmarker.task",
-        "keypoint_classifier_labels": "model/keypoint_classifier_labels.csv"
+        "keypoint_classifier_labels": "model/keypoint_classifier_label.csv"
     },
 
     "initial_options": {
-        "following": false
+        "following": true
     },
 
     "constants": {
@@ -27,7 +27,8 @@
             "hand_window_height": 300,
             "show_battery": false
         },
-        "buffer_length": 10
+        "buffer_length": 10,
+        "speed": 40
     },
 
     "simulation": true

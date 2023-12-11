@@ -8,6 +8,6 @@ Left -> Thumbs Left (6)
 Right -> Thumbs Right (7)
 Follow -> You (hacer) (8)
 Circle -> Cross maomenos (9)
-Change follow -> Fist with knuckles visible (5 del pibe)
+Change follow -> Fist with knuckles visible (10)
 Surf -> Roll (hacer)
 takeoff? no

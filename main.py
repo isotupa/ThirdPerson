@@ -28,6 +28,18 @@ def control(key, tello):
     elif key == ord('f'):
         tello.move_down(30)
 
+def overlay_text_on_rect(frame, text, rect_position, text_position, font_scale=1, color=(255, 255, 255), thickness=2):
+    # Create a black rectangle as background for text
+    rect_width = 300
+    rect_height = 200
+    rect_end_x = rect_position[0] + rect_width
+    rect_end_y = rect_position[1] + rect_height
+    cv.rectangle(frame, rect_position, (rect_end_x, rect_end_y), (0, 0, 0), -1)  # Draw filled black rectangle
+
+    # Overlay text on the black rectangle
+    cv.putText(frame, text, text_position, cv.FONT_HERSHEY_SIMPLEX, font_scale, color, thickness, cv.LINE_AA)
+
+
 def main():
     with open('config.json', 'r') as config_file:
         config = json.load(config_file)
@@ -52,7 +64,10 @@ def main():
         min_hand_tracking_confidence=config['constants']['hands']['min_tracking_confidence'],
     )
 
-    instructions = gesture_instructions.Instructions()
+    instructions = gesture_instructions.Instructions(
+        following=config['initial_options']['following'],
+        speed=config['constants']['speed']
+    )
     buffer = gesture_buffer.GestureBuffer(buffer_len=config['constants']['buffer_length'])
 
     gesture_recognizer = gesture_recognition.GestureRecognizer(
@@ -87,11 +102,16 @@ def main():
         type_move, move = instructions.calculate_move(gesture, pose_result, image)
         print(move)
 
-        cv.putText(main_window_image, f'{instructions.get_follow_state()}', (330, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
+        overlay_text_on_rect(main_window_image, f'{instructions.get_follow_state()}', (20, 20), (30, 60))
+        overlay_text_on_rect(main_window_image, f'{move}', (20, 80), (30, 120))
+        overlay_text_on_rect(main_window_image, f'{battery}', (20, 140), (30, 180))
+        overlay_text_on_rect(main_window_image, f'{gesture_name}', (20, 200), (30, 240))
+
+        # cv.putText(main_window_image, f'{instructions.get_follow_state()}', (330, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
         cv.imshow('ThirdPerson', main_window_image)
-        if right_hand_roi is not None:
-            cv.putText(hand_window_image, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
-            cv.imshow('Right hand', hand_window_image)
+        # if right_hand_roi is not None:
+            # cv.putText(hand_window_image, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
+        cv.imshow('Right hand', hand_window_image)
 
         
         # if not instructions.get_takeoff_state() and type_move == 'tuple':

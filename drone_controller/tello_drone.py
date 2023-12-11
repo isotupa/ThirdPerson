@@ -22,7 +22,7 @@ class TelloDroneController(DroneController):
         if self.drone:
             frame = self.drone.get_frame_read().frame
             frame = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
-            # frame = cv.flip(frame, 1)
+            frame = cv.flip(frame, 1)
             return frame
         return None
 

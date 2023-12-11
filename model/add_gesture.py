@@ -8,7 +8,7 @@ import numpy as np
 
 from mediapipe.framework.formats import landmark_pb2
 
-NUMBER = 20
+NUMBER = 0
 i = 0
 
 class landmarker_and_result():
@@ -146,8 +146,9 @@ with open(csv_path, 'a', newline="") as f:
         ret, frame = cap.read()
         # mirror frame
         frame = cv2.flip(frame, 1)
+        frame_resized = cv2.resize(frame, (300, 300))
         # update landmarker results
-        hand_landmarker.detect_async(frame)
+        hand_landmarker.detect_async(frame_resized)
         # draw landmarks on frame
         frame = draw_landmarks_on_image(frame,hand_landmarker.result)
 

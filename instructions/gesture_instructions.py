@@ -4,20 +4,17 @@ import numpy as np
 import cv2 as cv
 
 class Instructions():
-    takeoff = False
-    follow_behaviour = False
-    moving = False
-    previous_move = (0,0,0,0)
-    desired_distance = 200
-    forward_backward_threshold = 25
 
-
-    def __init__(self, speed=40, width=1000, height=500):
+    def __init__(self, following, speed=40, width=1000, height=500):
         self.speed = speed
         self.width = width
         self.height = height
         self.center_x = width / 2
         self.center_y = height / 2
+        self.follow_behaviour = following
+        self.desired_distance = 200
+        self.forward_backward_threshold = 25
+        self.takeoff = False
 
     def get_follow_state(self):
         return self.follow_behaviour
@@ -26,40 +23,38 @@ class Instructions():
         return self.takeoff
 
     def calculate_move(self, gesture_id, pose, image):
-        # if gesture_id == None:
-        #     return 'tuple', (0,0,0,0)
+        move = (0,0,0,0)
 
-        # if self.follow_behaviour:
-        #     match gesture_id:
-        #         case 0: # Forward
-        #             self.desired_distance += 10
-        #         case 1: # Stop
-        #             self.follow_behaviour = not self.follow_behaviour
-        #         case 2: # Up
-        #             self.center_y += 10
-        #         case 3: # Land
-        #             return 'land', None
-        #         case 4: # Down
-        #             self.center_y -= 10
-        #         case 5: # Back
-        #             self.desired_distance -= 10
-        #         case 6: # Left
-        #             self.center_x += 10
-        #         case 7: # Right
-        #             self.center_x -= 10
-        #         case 8: # Toggle follow
-        #             self.follow_behaviour = not self.follow_behaviour
-        #         case 9: # Semicircle
-        #             self.follow_behaviour = not self.follow_behaviour
-        #             return 'tuple', self.semicircle()
-        #         case 10: # change follow
-        #             self.follow_behaviour = not self.follow_behaviour
-        #             return 'tuple', self.find_next_person()
-        #         case 11: # roll
-        #             return 'roll', None
-        #     return 'tuple', self.follow(pose, image)
+        if self.follow_behaviour:
+            match gesture_id:
+                case 0: # Forward
+                    self.desired_distance += 10
+                case 1: # Stop
+                    self.follow_behaviour = not self.follow_behaviour
+                case 2: # Up
+                    self.center_y += 10
+                case 3: # Land
+                    return 'land', None
+                case 4: # Down
+                    self.center_y -= 10
+                case 5: # Back
+                    self.desired_distance -= 10
+                case 6: # Left
+                    self.center_x += 10
+                case 7: # Right
+                    self.center_x -= 10
+                case 8: # Toggle follow
+                    self.follow_behaviour = not self.follow_behaviour
+                case 9: # Semicircle
+                    self.follow_behaviour = not self.follow_behaviour
+                    return 'tuple', self.semicircle()
+                case 10: # change follow
+                    self.follow_behaviour = not self.follow_behaviour
+                    return 'tuple', self.find_next_person()
+                case 11: # roll
+                    return 'roll', None
+            return 'tuple', self.follow(pose, image)
 
-        move = self.previous_move
         match gesture_id:
             case 0: # Forward
                 move = (0, self.speed, 0, 0)
@@ -88,7 +83,6 @@ class Instructions():
             case 11: # roll
                 # return 'tuple', (0,0,0,0)
                 return 'roll', None
-        self.previous_move = move
         return 'tuple', move
     
     
@@ -138,10 +132,11 @@ class Instructions():
         return -velocity
 
     def follow(self, pose, image):
-        if pose is None or pose.pose_landmarks is None:
+        if pose is None or not hasattr(pose, 'pose_landmarks'):
             return (0,0,0,0)
         height, width, _ = image.shape
-        keypoints = [(int(lm.x * width), int(lm.y * height)) for lm in pose.pose_landmarks.landmark]
+        landmarks = pose.pose_landmarks[0]
+        keypoints = [(int(lm.x * width), int(lm.y * height)) for lm in landmarks]
 
         # Calculate speed based on the difference between current distance and desired distance
         nose_x, nose_y = keypoints[0] if keypoints else (0, 0)
