@@ -32,10 +32,10 @@ def main():
     # drone = tello_drone.TelloDroneController()
     drone.connect_to_drone()
 
-    hand_detection = mediapipe_utils.HandDetection()
+    hand_detection = mediapipe_utils.HandPoseDetection()
 
-    hand_detection.initialise_hands()
-    hand_detection.initialise_pose()
+    # hand_detection.initialise_hands()
+    # hand_detection.initialise_pose()
 
     instructions = gesture_instructions.Instructions()
     buffer = gesture_buffer.GestureBuffer(buffer_len=10)
@@ -60,7 +60,7 @@ def main():
         hands_results = hand_detection.extract_hands(right_hand_roi)
         # right_hand = mediapipe_utils.draw_hands(right_hand_roi, hands_results)
         debug_image = hand_detection.draw_landmarks_on_image(right_hand_roi, hands_results)
-        hand_detection.draw_pose(image, pose_results)
+        annontated_image = hand_detection.draw_pose(image, pose_results)
         gesture_id, labels = gesture_recognizer.recognize_gesture(hands_results, image)
         gesture_name = gesture_recognizer.translate_gesture_id_to_name(gesture_id)
         buffer.add_gesture(gesture_id)
@@ -68,10 +68,10 @@ def main():
 
 
         cv.putText(image, f'{instructions.get_follow_state()}', (330, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
-        cv.imshow('ThirdPerson', image)
+        cv.imshow('ThirdPerson', annontated_image)
         if right_hand_roi is not None:
             # cv.putText(right_hand_roi, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
-            # cv.putText(debug_image, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
+            cv.putText(debug_image, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
             cv.imshow('Right hand', debug_image)
 
         type_move, move = instructions.calculate_move(gesture, pose_results, image)
