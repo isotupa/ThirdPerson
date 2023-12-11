@@ -1,0 +1,34 @@
+{
+    "model_paths": {
+        "pose_landmarker": "model/pose_landmarker_heavy.task",
+        "gesture_recogniser": "model/keypoint_classifier.tflite",
+        "hand_landmarker": "model/hand_landmarker.task",
+        "keypoint_classifier_labels": "model/keypoint_classifier_labels.csv"
+    },
+
+    "initial_options": {
+        "following": false
+    },
+
+    "constants": {
+        "pose": {
+            "min_pose_detection_confidence": 0.3,
+            "min_pose_presence_confidence": 0.3,
+            "min_tracking_confidence": 0.3,
+            "safe_zone": true
+        },
+        "hands": {
+            "min_hand_detection_confidence": 0.3,
+            "min_hand_presence_confidence": 0.3,
+            "min_tracking_confidence": 0.3
+        },
+        "gui": {
+            "hand_window_width": 300,
+            "hand_window_height": 300,
+            "show_battery": false
+        },
+        "buffer_length": 10
+    },
+
+    "simulation": true
+  }

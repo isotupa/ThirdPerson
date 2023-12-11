@@ -6,6 +6,7 @@ from instructions import gesture_buffer
 from mp_utils import pose_hands
 import cv2 as cv
 import threading
+import json
 # import time
 
 
@@ -28,16 +29,36 @@ def control(key, tello):
         tello.move_down(30)
 
 def main():
-    drone = webcam_drone.WebcamSimulationController()
-    # drone = tello_drone.TelloDroneController()
+    with open('config.json', 'r') as config_file:
+        config = json.load(config_file)
+    
+    if config['simulation']:
+        drone = webcam_drone.WebcamSimulationController()
+    else:
+        drone = tello_drone.TelloDroneController()
+
     drone.connect_to_drone()
 
-    hand_pose_detection = pose_hands.HandPoseDetection()
+    hand_pose_detection = pose_hands.HandPoseDetection(
+        hand_region_window_width=config['constants']['gui']['hand_window_width'],
+        hand_region_window_height=config['constants']['gui']['hand_window_height'],
+        pose_model_asset_path=config['model_paths']['pose_landmarker'],
+        min_pose_detection_confidence=config['constants']['pose']['min_pose_detection_confidence'],
+        min_pose_presence_confidence=config['constants']['pose']['min_pose_presence_confidence'],
+        min_pose_tracking_confidence=config['constants']['pose']['min_tracking_confidence'],
+        safe_zone=config['constants']['pose']['safe_zone'],
+        hand_model_asset_path=config['model_paths']['hand_landmarker'],
+        min_hand_presence_confidence=config['constants']['hands']['min_hand_presence_confidence'],
+        min_hand_tracking_confidence=config['constants']['hands']['min_tracking_confidence'],
+    )
 
     instructions = gesture_instructions.Instructions()
-    buffer = gesture_buffer.GestureBuffer(buffer_len=10)
+    buffer = gesture_buffer.GestureBuffer(buffer_len=config['constants']['buffer_length'])
 
-    gesture_recognizer = gesture_recognition.GestureRecognizer()
+    gesture_recognizer = gesture_recognition.GestureRecognizer(
+        model_path=config['model_paths']['gesture_recogniser'],
+        label_path=config['model_paths']['keypoint_classifier_labels']
+    )
 
     # desired_fps = 15
     # interval = 1.0 / desired_fps
@@ -63,6 +84,8 @@ def main():
         buffer.add_gesture(gesture_id)
         gesture = buffer.get_gesture()
 
+        type_move, move = instructions.calculate_move(gesture, pose_result, image)
+        print(move)
 
         cv.putText(main_window_image, f'{instructions.get_follow_state()}', (330, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
         cv.imshow('ThirdPerson', main_window_image)
@@ -70,8 +93,6 @@ def main():
             cv.putText(hand_window_image, f'Gesture: {gesture_name}', (0, 290), cv.FONT_HERSHEY_SIMPLEX, 1, (0,200,0), 2)
             cv.imshow('Right hand', hand_window_image)
 
-        type_move, move = instructions.calculate_move(gesture, pose_result, image)
-        print(move)
         
         # if not instructions.get_takeoff_state() and type_move == 'tuple':
         if type_move == 'tuple':
