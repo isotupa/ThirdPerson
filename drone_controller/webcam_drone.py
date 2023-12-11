@@ -16,6 +16,9 @@ class WebcamSimulationController(DroneController):
     def get_camera_image(self):
         ret, image = self.drone.read()
         return image
+    
+    def get_drone(self):
+        return None
 
     def initialise_drone(self):
         pass

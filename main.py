@@ -5,6 +5,7 @@ from neural_network import gesture_recognition
 from instructions import gesture_instructions
 from instructions import gesture_buffer
 import cv2 as cv
+import threading
 # import time
 
 
@@ -27,8 +28,8 @@ def control(key, tello):
         tello.move_down(30)
 
 def main():
-    # drone = webcam_drone.WebcamSimulationController()
-    drone = tello_drone.TelloDroneController()
+    drone = webcam_drone.WebcamSimulationController()
+    # drone = tello_drone.TelloDroneController()
     drone.connect_to_drone()
 
     mediapipe_utils.initialise_hands()
@@ -86,7 +87,8 @@ def main():
         elif key == ord(' '):
             drone.initialise_drone()
         else:
-            control(key, drone.get_drone())
+            threading.Thread(target=control, args=(key,drone.get_drone())).start()
+            # control(key, drone.get_drone())
         
         # elapsed_time = time.time() - start_time
         # time_to_wait = max(0, interval - elapsed_time)
@@ -95,5 +97,7 @@ def main():
     drone.terminate_drone()
     mediapipe_utils.terminate_hands()
     mediapipe_utils.terminate_pose()
+
+    
 if __name__ == "__main__":
     main()

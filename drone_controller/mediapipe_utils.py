@@ -9,7 +9,7 @@ mp_hands = mp.solutions.hands
 constant_width = 300
 constant_height = 300
 
-safe_zone = True
+safe_zone = False
 
 global pose
 global hands
@@ -30,7 +30,7 @@ def initialise_pose(min_detection_confidence=0.6, min_tracking_confidence=0.3):
     pose = mp_pose.Pose(min_detection_confidence=min_detection_confidence,
                          min_tracking_confidence=min_tracking_confidence)
     
-def initialise_hands(min_detection_confidence=0.4, min_tracking_confidence=0.3):
+def initialise_hands(min_detection_confidence=0.2, min_tracking_confidence=0.2):
     global hands
     hands = mp_hands.Hands(min_detection_confidence=min_detection_confidence,
                          min_tracking_confidence=min_tracking_confidence) 
@@ -48,7 +48,8 @@ def extract_hands(image):
     return hands_result
     
 def draw_hands(image, hands_result):
-    if image is None or hands_result is None:
+    # if image is None or hands_result is None:
+    if image is None:
         return None
     if hands_result.multi_hand_landmarks:
         for hand_landmarks in hands_result.multi_hand_landmarks:
