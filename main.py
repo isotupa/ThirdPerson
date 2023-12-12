@@ -75,7 +75,7 @@ def main():
         hand_result = hand_pose_detection.extract_hands(right_hand_roi)
         hand_window_image = hand_pose_detection.draw_hands(right_hand_roi)
 
-        gesture_id, labels = gesture_recognizer.recognize_gesture(hand_result, right_hand_roi)
+        gesture_id, _ = gesture_recognizer.recognize_gesture(hand_result, right_hand_roi)
         gesture_name = gesture_recognizer.translate_gesture_id_to_name(gesture_id)
         buffer.add_gesture(gesture_id)
         gesture = buffer.get_gesture()
