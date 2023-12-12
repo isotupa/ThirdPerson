@@ -15,22 +15,26 @@ class Instructions():
         self.desired_distance = 200
         self.forward_backward_threshold = 25
         self.takeoff = False
+        self.previous_move = (0,0,0,0)
 
     def get_follow_state(self):
         return self.follow_behaviour
+    
+    def change_follow_behaviour(self):
+        self.previous_move = (0,0,0,0)
+        self.follow_behaviour = not self.follow_behaviour
 
     def get_takeoff_state(self):
         return self.takeoff
 
     def calculate_move(self, gesture_id, pose, image):
-        move = (0,0,0,0)
 
         if self.follow_behaviour:
             match gesture_id:
                 case 0: # Forward
                     self.desired_distance += 10
                 case 1: # Stop
-                    self.follow_behaviour = not self.follow_behaviour
+                    self.change_follow_behaviour()
                 case 2: # Up
                     self.center_y += 10
                 case 3: # Land
@@ -44,17 +48,18 @@ class Instructions():
                 case 7: # Right
                     self.center_x -= 10
                 case 8: # Toggle follow
-                    self.follow_behaviour = not self.follow_behaviour
-                case 9: # Semicircle
-                    self.follow_behaviour = not self.follow_behaviour
-                    return 'tuple', self.semicircle()
-                case 10: # change follow
-                    self.follow_behaviour = not self.follow_behaviour
-                    return 'tuple', self.find_next_person()
+                    self.change_follow_behaviour()
+                # case 9: # Semicircle
+                #     self.follow_behaviour = not self.follow_behaviour
+                #     return 'tuple', self.semicircle()
+                # case 10: # change follow
+                #     self.follow_behaviour = not self.follow_behaviour
+                #     return 'tuple', self.find_next_person()
                 case 11: # roll
                     return 'roll', None
             return 'tuple', self.follow(pose, image)
 
+        move = self.previous_move
         match gesture_id:
             case 0: # Forward
                 move = (0, self.speed, 0, 0)
@@ -69,11 +74,11 @@ class Instructions():
             case 5: # Back
                 move = (0, -self.speed, 0, 0)
             case 6: # Left
-                move = (self.speed, 0,0,0)
+                move = (self.speed, 0,0,self.speed)
             case 7: # Right
-                move = (-self.speed, 0,0,0)
+                move = (-self.speed, 0,0,self.speed)
             case 8: # Toggle follow
-                self.follow_behaviour = not self.follow_behaviour
+                self.change_follow_behaviour()
                 move = self.follow(pose, image)
             case 9: # Semicircle
                 move = (0,0,0,0)
@@ -83,6 +88,7 @@ class Instructions():
             case 11: # roll
                 # return 'tuple', (0,0,0,0)
                 return 'roll', None
+        self.previous_move = move
         return 'tuple', move
     
     
@@ -132,7 +138,7 @@ class Instructions():
         return -velocity
 
     def follow(self, pose, image):
-        if pose is None or not hasattr(pose, 'pose_landmarks'):
+        if pose is None or not hasattr(pose, 'pose_landmarks') or len(pose.pose_landmarks) == 0:
             return (0,0,0,0)
         height, width, _ = image.shape
         landmarks = pose.pose_landmarks[0]
@@ -165,13 +171,13 @@ class Instructions():
 
         # Drone movement control based on pose keypoints
         if nose_x < center_x - threshold_x:
-            result[0] = -int(velocity_x/2)
-            result[3] = -velocity_x
+            result[0] = int(velocity_x/2)
+            result[3] = velocity_x
             # return (-velocity_x,0,0,-velocity_x)
             # drone.move_left(velocity_x)
         elif nose_x > center_x + threshold_x:
-            result[0] = int(velocity_x/2)
-            result[3] = velocity_x
+            result[0] = -int(velocity_x/2)
+            result[3] = -velocity_x
             # drone.move_right(velocity_x)
             # return (velocity_x,0,0,velocity_x)
         
@@ -189,7 +195,7 @@ class Instructions():
         calc = int(self.calculate_velocity_z(keypoints[0], keypoints[12], keypoints[11]))
         # print(f'mediapipe depth: {pose.pose_landmarks.landmark[0].z}')
         # print(f'mediapipe world: {pose.pose_world_landmarks.landmark[0].z}')
-        print(f'triangle average:{average}')
+        # print(f'triangle average:{average}')
         # print(f'triangle height:{tri_height}')
         # print(f'classic: {calc}')
         result[1] = int(calc)

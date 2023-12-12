@@ -8,7 +8,7 @@ import numpy as np
 
 from mediapipe.framework.formats import landmark_pb2
 
-NUMBER = 0
+NUMBER = 2
 i = 0
 
 class landmarker_and_result():
@@ -78,22 +78,17 @@ def add_to_csv(image, results, writer):
     if results.hand_landmarks is not None:
         for hand_landmarks in results.hand_landmarks:
             landmark_list = calc_landmark_list(image, hand_landmarks)
-            # print(landmark_list)
 
             # Conversion to relative coordinates / normalized coordinates
-            pre_processed_landmark_list = pre_process_landmark(
-                landmark_list)
+            pre_processed_landmark_list = pre_process_landmark(landmark_list)
             
-            # print(pre_processed_landmark_list)
-
-            # Write to the dataset file
-            # threading.Thread(target=writer.writerow, args=[mode, *pre_processed_landmark_list]).start()
             writer.writerow([NUMBER, *pre_processed_landmark_list])
             print("WRITE " + str(i))
             i += 1
 
 def calc_landmark_list(image, landmarks):
-    image_width, image_height = image.shape[1], image.shape[0]
+    # image_width, image_height = image.shape[1], image.shape[0]
+    image_width, image_height = 300, 300
 
     landmark_point = []
 
@@ -146,21 +141,38 @@ with open(csv_path, 'a', newline="") as f:
         ret, frame = cap.read()
         # mirror frame
         frame = cv2.flip(frame, 1)
-        frame_resized = cv2.resize(frame, (300, 300))
+        height, width, _ = frame.shape
+        # frame_resized = cv2.resize(frame, (width/2, height/2))
+        min_dimension = min(height, width)
+        start_x = int((width - min_dimension) / 2)
+        start_y = int((height - min_dimension) / 2)
+
+        # Crop the frame to a square
+        square_frame = frame[start_y:start_y + min_dimension, start_x:start_x + min_dimension]
+        square_frame = np.array(square_frame)
+        # square_frame = frame
+
         # update landmarker results
-        hand_landmarker.detect_async(frame_resized)
+        hand_landmarker.detect_async(square_frame)
         # draw landmarks on frame
-        frame = draw_landmarks_on_image(frame,hand_landmarker.result)
+        square_frame = draw_landmarks_on_image(square_frame,hand_landmarker.result)
 
         # display image
-        cv2.imshow('frame',frame)
+        cv2.putText(square_frame, f'{NUMBER}', (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (200, 0, 0), 2)
+        cv2.imshow('frame',square_frame)
         key = cv2.waitKey(1)
+
         if key == ord('q'):
             break
         elif key == ord(' '):
-            add_to_csv(frame, hand_landmarker.result, writer)
+            add_to_csv(square_frame, hand_landmarker.result, writer)
+        elif key == ord('n'):
+            NUMBER += 1
+            i = 0
+        elif key == ord('p'):
+            NUMBER -= 1
+            i = 0
     
-    # release everything
 hand_landmarker.close()
 cap.release()
 cv2.destroyAllWindows()

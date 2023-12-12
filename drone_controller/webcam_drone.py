@@ -15,6 +15,7 @@ class WebcamSimulationController(DroneController):
 
     def get_camera_image(self):
         ret, image = self.drone.read()
+        image = cv.flip(image, 1)
         return image
     
     def get_drone(self):

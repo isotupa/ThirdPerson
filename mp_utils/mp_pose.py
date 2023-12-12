@@ -96,8 +96,8 @@ class PoseDetection():
         if pose_results is None or not hasattr(pose_results, 'pose_landmarks') or len(pose_results.pose_landmarks) == 0:
             return np.zeros((self.hand_region_window_height, self.hand_region_window_width, 3), np.uint8)
 
-        # left_hand_indices = [15, 17, 19, 21]
-        right_hand_indices = [16, 18, 20, 22]
+        right_hand_indices = [15, 17, 19, 21]
+        # right_hand_indices = [16, 18, 20, 22]
 
         # Convert the landmarks to pixel coordinates
         image_height, image_width, _ = image.shape
@@ -135,15 +135,17 @@ class PoseDetection():
 
         # Extract regions within the rectangles
         # left_hand_region = image[left_hand_y:left_hand_y + left_hand_h, left_hand_x:left_hand_x + left_hand_w]
-        right_hand_region = image.copy()[right_hand_y:right_hand_y + right_hand_h, right_hand_x:right_hand_x + right_hand_w]
+        original = image.copy()
+        right_hand_region = original[right_hand_y:right_hand_y + right_hand_h, right_hand_x:right_hand_x + right_hand_w]
 
         # cv.rectangle(image, (left_hand_x, left_hand_y), (left_hand_x + left_hand_w, left_hand_y + left_hand_h),
         #                 (0, 255, 0), 2)
+
         cv.rectangle(image, (right_hand_x, right_hand_y),
                         (right_hand_x + right_hand_w, right_hand_y + right_hand_h), (0, 255, 0), 2)
 
-        elbow_landmark = pose_landmarks[solutions.pose.PoseLandmark.RIGHT_ELBOW]
-        wrist_landmark = pose_landmarks[solutions.pose.PoseLandmark.RIGHT_WRIST]
+        elbow_landmark = pose_landmarks[solutions.pose.PoseLandmark.LEFT_ELBOW]
+        wrist_landmark = pose_landmarks[solutions.pose.PoseLandmark.LEFT_WRIST]
 
         # Extract y-coordinates of elbow and wrist
         elbow_y = int(elbow_landmark.y * image_height)

@@ -1,6 +1,7 @@
 from djitellopy import Tello
 import threading
 import cv2 as cv
+import time
 
 from drone_controller.drone_interface import DroneController
 
@@ -28,14 +29,18 @@ class TelloDroneController(DroneController):
 
     def initialise_drone(self):
         if self.drone:
-            self.drone.takeoff()
+            threading.Thread(target=self.drone.takeoff).start()
+            # self.drone.takeoff()
             self.takeoff = True
-            self.drone.move_up(50)
+            time.sleep(1)
+            threading.Thread(target=self.drone.move_up, args=(50)).start()
+            # self.drone.move_up(50)
 
     def terminate_drone(self):
         if self.drone:
             if self.takeoff:
-                self.drone.land()
+                threading.Thread(target=self.drone.land).start()
+                # self.drone.land()
             self.drone.streamoff()
             self.drone.end()
 
