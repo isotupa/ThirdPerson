@@ -4,10 +4,9 @@ from neural_network import gesture_recognition
 from instructions import gesture_instructions
 from instructions import gesture_buffer
 from mp_utils import pose_hands
-import cv2 as cv
+from gui import gui
 import threading
 import json
-import numpy as np
 
 
 def control(key, tello):
@@ -28,16 +27,6 @@ def control(key, tello):
     elif key == ord('f'):
         tello.move_down(30)
 
-def overlay_text_on_rect(frame, text, rect_position, text_position, font_scale=1, color=(255, 255, 255), thickness=2):
-    rect_width = 300
-    rect_height = 200
-    rect_end_x = rect_position[0] + rect_width
-    rect_end_y = rect_position[1] + rect_height
-    cv.rectangle(frame, rect_position, (rect_end_x, rect_end_y), (0, 0, 0), -1)
-
-    cv.putText(frame, text, text_position, cv.FONT_HERSHEY_SIMPLEX, font_scale, color, thickness, cv.LINE_AA)
-
-
 def main():
     with open('config.json', 'r') as config_file:
         config = json.load(config_file)
@@ -46,6 +35,8 @@ def main():
         drone = webcam_drone.WebcamSimulationController()
     else:
         drone = tello_drone.TelloDroneController()
+
+    tp_gui = gui.ThirdPersonGUI(config['constants']['gui']['hand_window_height'], config['constants']['gui']['hand_window_width'])
 
     drone.connect_to_drone()
 
@@ -91,20 +82,14 @@ def main():
 
         type_move, move = instructions.calculate_move(gesture, pose_result, image)
 
-        height, width, _ = image.shape
-        info_window = np.zeros((height-config['constants']['gui']['hand_window_height'], config['constants']['gui']['hand_window_width'], 3), dtype=np.uint8)
-        if instructions.get_follow_state():
-            overlay_text_on_rect(info_window, f'Following', (20, 20), (30, 60))
-        else:
-            overlay_text_on_rect(info_window, f'Not following', (20, 20), (30, 60))
-
-        overlay_text_on_rect(info_window, f'{move}', (20, 80), (30, 120))
-        overlay_text_on_rect(info_window, f'{battery}%', (20, 140), (30, 180))
-        overlay_text_on_rect(info_window, f'{gesture_name}', (20, 200), (30, 240))
-        left_column = np.vstack((hand_window_image, info_window))
-        full_frame = np.hstack((main_window_image, left_column))
-
-        cv.imshow('ThirdPerson', full_frame)
+        tp_gui.update_camera_window(main_window_image)
+        tp_gui.update_hand_window(hand_window_image)
+        tp_gui.update_info_window(instructions.get_follow_state(),
+                                  move,
+                                  battery,
+                                  gesture_name)
+        tp_gui.show_window()
+        key = tp_gui.getKey()
 
         if type_move == 'tuple':
             drone.execute_instruction(move)
@@ -113,7 +98,6 @@ def main():
         elif type_move == 'roll':
             drone.execute_roll()
         
-        key = cv.waitKey(1)
         if key == ord('q'):
             break
         elif key == ord(' '):
@@ -127,6 +111,7 @@ def main():
 
     drone.terminate_drone()
     hand_pose_detection.close()
+    tp_gui.close()
 
 
 if __name__ == "__main__":
