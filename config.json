@@ -27,9 +27,9 @@
             "hand_window_height": 300,
             "show_battery": false
         },
-        "buffer_length": 10,
+        "buffer_length": 13,
         "speed": 20
     },
 
-    "simulation": true
+    "simulation": false
   }

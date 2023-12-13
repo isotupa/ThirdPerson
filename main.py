@@ -94,6 +94,8 @@ def main():
         if type_move == 'tuple':
             drone.execute_instruction(move)
         elif type_move == 'land':
+            tp_gui.landing()
+            tp_gui.show_window()
             break
         elif type_move == 'roll':
             drone.execute_roll()

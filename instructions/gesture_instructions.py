@@ -74,7 +74,7 @@ class Instructions():
             case 5: # Back
                 move = (0, -self.speed, 0, 0)
             case 6: # Left
-                move = (self.speed, 0,0,self.speed)
+                move = (self.speed, 0,0,-self.speed)
             case 7: # Right
                 move = (-self.speed, 0,0,self.speed)
             case 8: # Toggle follow

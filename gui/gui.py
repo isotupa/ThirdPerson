@@ -16,13 +16,19 @@ class ThirdPersonGUI():
         cv.destroyAllWindows()
 
     def show_window(self):
-        left_column = np.vstack((self.hand_window, self.info_window))
-        full_frame = np.hstack((self.camera_window, left_column))
-        cv.imshow('ThirdPerson', full_frame)
+        # left_column = np.vstack((self.hand_window, self.info_window))
+        # full_frame = np.hstack((self.camera_window, left_column))
+        # cv.imshow('ThirdPerson', full_frame)
+        cv.imshow("ThirdPerson", self.camera_window)
+        cv.imshow("Info", self.info_window)
+        cv.imshow("hand", self.hand_window)
         self.key = cv.waitKey(1)
 
     def getKey(self):
         return self.key
+
+    def landing(self):
+        cv.putText(self.camera_window, "Landing...", (300,400), cv.FONT_HERSHEY_SIMPLEX, 3, (200,0,0), 2)
 
     def update_hand_window(self, hand_window_image):
         self.hand_window = hand_window_image
@@ -42,7 +48,8 @@ class ThirdPersonGUI():
 
     def update_info_window(self, follow_state, move, battery, gesture_name):
         height, width, _ = self.camera_window.shape
-        self.info_window = np.zeros((height-self.hand_window_height, self.hand_window_width, 3), dtype=np.uint8)
+        # self.info_window = np.zeros((height-self.hand_window_height, self.hand_window_width, 3), dtype=np.uint8)
+        self.info_window = np.zeros((400,300,3), dtype=np.uint8)
         if follow_state:
             self.overlay_text_on_rect(self.info_window, f'Following', (20, 20), (30, 60))
         else:
