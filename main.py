@@ -32,7 +32,7 @@ def main():
         config = json.load(config_file)
     
     if config['simulation']:
-        drone = webcam_drone.WebcamSimulationController()
+        drone = webcam_drone.WebcamSimulationController(config['constants']['webcam_number'])
     else:
         drone = tello_drone.TelloDroneController()
 
@@ -94,20 +94,23 @@ def main():
         if type_move == 'tuple':
             drone.execute_instruction(move)
         elif type_move == 'land':
+            drone.land()
             tp_gui.landing()
             tp_gui.show_window()
             break
         elif type_move == 'roll':
             drone.execute_roll()
         
-        if key == ord('q'):
-            break
+        if key == ord('l'):
+            drone.land()
         elif key == ord(' '):
             drone.initialise_drone()
         elif key == ord('f'):
             instructions.follow_behaviour = not instructions.follow_behaviour
         elif key == ord('p'):
             drone.execute_roll()
+        elif key == ord('q'):
+            break
         else:
             threading.Thread(target=control, args=(key,drone.get_drone())).start()
 

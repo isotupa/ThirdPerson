@@ -54,8 +54,8 @@ class Instructions():
                 # case 10: # change follow
                 #     self.follow_behaviour = not self.follow_behaviour
                 #     return 'tuple', self.find_next_person()
-                case 11: # roll
-                    return 'roll', None
+                # case 11: # roll
+                #     return 'roll', None
             return 'tuple', self.follow(pose, image)
 
         move = self.previous_move
@@ -81,12 +81,12 @@ class Instructions():
                 move = self.follow(pose, image)
             case 9: # Semicircle
                 move = (0,0,0,0)
-            case 10: # change follow
-                return 'tuple', (0,0,0,0)
-                return 'tuple', self.find_next_person()
-            case 11: # roll
-                # return 'tuple', (0,0,0,0)
-                return 'roll', None
+            # case 10: # change follow
+            #     return 'tuple', (0,0,0,0)
+            #     return 'tuple', self.find_next_person()
+            # case 11: # roll
+            #     # return 'tuple', (0,0,0,0)
+            #     return 'roll', None
         self.previous_move = move
         return 'tuple', move
     
@@ -124,12 +124,10 @@ class Instructions():
         desired_distance = self.desired_distance
 
         if distance < desired_distance - threshold:
-            # Simplified calculation for moving backward
             velocity = max(-max_speed, -max_speed * ((distance - desired_distance) / (max_distance - desired_distance - threshold)))
             velocity = -velocity
     
         elif distance > desired_distance + threshold:
-            # Simplified calculation for moving forward
             velocity = min(max_speed, max_speed * ((distance - desired_distance) / (max_distance - desired_distance - threshold)))
         else:
             velocity = 0
@@ -143,7 +141,6 @@ class Instructions():
         landmarks = pose.pose_landmarks[0]
         keypoints = [(int(lm.x * width), int(lm.y * height)) for lm in landmarks]
 
-        # Calculate speed based on the difference between current distance and desired distance
         nose_x, nose_y = keypoints[0] if keypoints else (0, 0)
         neck_x, neck_y = keypoints[12] if keypoints else (0,0)
         neck1_x, neck1_y = keypoints[11] if keypoints else (0,0)

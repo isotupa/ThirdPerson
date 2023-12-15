@@ -28,7 +28,8 @@
             "show_battery": false
         },
         "buffer_length": 13,
-        "speed": 20
+        "speed": 40,
+        "webcam_number": 0
     },
 
     "simulation": false

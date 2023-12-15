@@ -4,12 +4,13 @@ import cv2 as cv
 from drone_controller.drone_interface import DroneController
 
 class WebcamSimulationController(DroneController):
-    def __init__(self):
+    def __init__(self, webcam_number=0):
         self.drone = None
         self.takeoff = False
+        self.webcam_number = webcam_number
 
     def connect_to_drone(self):
-        cap = cv.VideoCapture(0)
+        cap = cv.VideoCapture(self.webcam_number)
         self.drone = cap
         return self.drone
 
@@ -35,3 +36,6 @@ class WebcamSimulationController(DroneController):
 
     def get_battery(self):
         return 100
+
+    def land(self):
+        pass

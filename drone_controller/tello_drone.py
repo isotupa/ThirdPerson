@@ -30,17 +30,12 @@ class TelloDroneController(DroneController):
     def initialise_drone(self):
         if self.drone:
             threading.Thread(target=self.drone.takeoff).start()
-            # self.drone.takeoff()
             self.takeoff = True
             time.sleep(1)
             threading.Thread(target=self.drone.move_up, args=(50)).start()
-            # self.drone.move_up(50)
 
     def terminate_drone(self):
         if self.drone:
-            if self.takeoff:
-                threading.Thread(target=self.drone.land).start()
-                # self.drone.land()
             self.drone.streamoff()
             self.drone.end()
 
@@ -54,3 +49,6 @@ class TelloDroneController(DroneController):
     def get_battery(self):
         return self.drone.get_battery()
 
+    def land(self):
+        if self.takeoff:
+            threading.Thread(target=self.drone.land).start()
