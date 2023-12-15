@@ -21,7 +21,9 @@ class ThirdPersonGUI():
         # cv.imshow('ThirdPerson', full_frame)
         cv.imshow("ThirdPerson", self.camera_window)
         cv.imshow("Info", self.info_window)
+        cv.moveWindow("Info", 1000, 0)
         cv.imshow("hand", self.hand_window)
+        cv.moveWindow("hand", 1000, 300)
         self.key = cv.waitKey(1)
 
     def getKey(self):

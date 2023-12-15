@@ -32,5 +32,5 @@
         "webcam_number": 0
     },
 
-    "simulation": false
+    "simulation": true
   }
