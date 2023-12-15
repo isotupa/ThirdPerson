@@ -1,0 +1,6 @@
+numpy == 1.25.2
+mediapipe == 0.10.7
+cv2 == 4.8.1
+json == 2.0.9
+djitellopy == 2.5.0
+tensorflow == 2.14.0
