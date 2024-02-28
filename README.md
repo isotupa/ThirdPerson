@@ -16,7 +16,7 @@ Connect the Tello drone and execute `main.py`. If you do not have a drone, you c
 
 With the app running, 3 windows should open, as seen in the picture below:
 
-![gui](/img/gui.png)
+![gui](gui.png)
 
 Point to the drone to change the following mode.
 
