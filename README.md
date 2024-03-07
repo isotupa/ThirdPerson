@@ -26,4 +26,4 @@ ThirdPerson is designed to be highly customizable. Each module can be used indep
 
 ## Other stuff
 
-To read about the design behind this project, see [TODO]
+To read about the design behind this project, see [the thesis (in Spanish)](https://oa.upm.es/80489/)
